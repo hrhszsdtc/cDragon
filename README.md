@@ -1,4 +1,6 @@
 # cDragon
-This is a Chinese computer language written based on C/C++. Having high degrees of freedom and creativity
+
+这是一种基于 C/C++ 的中文编程语言.它具有高度的灵活性,并鼓励创造性。
 _____
-This project is still developing.
+
+***发展中....***
