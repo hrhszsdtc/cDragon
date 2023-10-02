@@ -5,7 +5,7 @@
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
-#include <Windows.h>
+#include <vector>
 
 using namespace std;
 
@@ -16,6 +16,15 @@ using namespace std;
 
 /* 用于显示程序运行时间 */
 const time_t BegTime = time(NULL);
+
+#ifdef _WIN32
+
+#elif __linux__
+
+#elif __APPLE__
+
+#endif
+
 
 /* 调试输出 */
 template<class T>
@@ -119,6 +128,7 @@ void ProgressBar::Set(double persent){
 }
 
 void ProgressBar_Test(){
+/*
 	ProgressBar *bar = new ProgressBar;
 	bar -> Install();
 	bar -> Show();
@@ -131,7 +141,7 @@ void ProgressBar_Test(){
 	Sleep(1000);
 	bar -> Set(75);
 	Sleep(1000);
-	bar -> Set(100);
+	bar -> Set(100);*/
 }
 // Class ProgressBar END============================================================
 
@@ -177,12 +187,25 @@ class Level0{
 	}
 };
 
+class Explainer{
+    private:
+        int color;
+    public:
+        void Install();
+        void Set_color();
+};
+void Explainer::Install(){
+    cout<<"";
+}
+
 /* 主函数 */
 int main(int argc,char* argv[]){
 	
 	/* 返回异常 */
-	if (argc == 1)
-		return -1;
+	if (argc == 1){
+        Explainer Obj;
+        Obj.Install();
+    }
 	Debug(__LINE__,argc);
 	Debug(__LINE__,argv[0]);
 	ProgressBar_Test();
