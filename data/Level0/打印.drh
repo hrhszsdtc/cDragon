@@ -1,2 +1,1 @@
-#include <stdOutput.h>
-stdPrint(
+printf
