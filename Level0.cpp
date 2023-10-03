@@ -11,7 +11,7 @@
 using namespace std;
 
 // 程序版本
-#define CDRAGON_INFORMATION "cDragon -Level0 Compiler V1.0.0 Alpha"
+#define CDRAGON_INFORMATION "cDragon -Level0 Compiler V0.1.1 Alpha\n内部版本0x0000001"
 /* 用于调试时使用，当为1时，是调试模式 */
 #define DEBUG 1
 
