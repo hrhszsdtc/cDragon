@@ -355,7 +355,7 @@ int main(int argc,char* argv[]){
 	int f = 1;
 	string tempL,head;
 	
-	head = "#include<iostream>\nusing namespace std;\nint main(int argc,char* argv[]){";
+	head = "#include<stdio.h>\nusing namespace std;\nint main(int argc,char* argv[]){";
 	oFile<<head<<endl;
 	while(!iFile.eof()){
 		iFile>>tempL;
