@@ -262,6 +262,7 @@ string Level0::Explain(string sentence, int line) {
 		
 		fstream file;
 		temp1 = "./data/Level0/" + temp1;
+	        temp1 += ".drh";
 		file.open(temp1,ios::in);
 		
 		/* 检查文件是否打开 */
