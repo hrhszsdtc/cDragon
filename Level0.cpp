@@ -5,7 +5,14 @@
 #include <fstream>
 #include <ctime>
 #include <cstdlib>
+#if defined(_WIN32)
 #include <Windows.h>
+#define Pause() system("pause")
+#else
+#include <unistd.h>
+#define Sleep(time) sleep(time/1000.0)
+#define Pause() pause()
+#endif
 #include <vector>
 
 using namespace std;
@@ -117,118 +124,143 @@ void Logging::Log(int Lv,string str){
 		cout<<"未打开日志文件或日志文件打开异常!"<<endl;
 }
 //进度条===================================================================
-class ProgressBar{
-	private:
-		//进度条长度
-		unsigned int BarLenth;
-		
-		//未完成进度填充符号
-		char UndoBar_Filling;
-		
-		//完成进度填充符号
-		char DoBar_Filling;
-		
-		//显示标记
-		bool ShowFlag = false;
-		
-	public:
-		//初始化
-		void Install();
-		//显示进度条
-		void Show();
-		
-		//设置进度条长度
-		void Set_BarLenth(unsigned int);
-		//设置未完成进度填充符号
-		void Set_UndoBar(char);
-		//设置完成进度填充符号
-		void Set_DoBar(char);
-		//设置完成进度
-		void Set(double);
-		
-		~ProgressBar();
-		
+class Builder
+{
+public:
+    virtual void Set_BarLenth(unsigned int) = 0;
+    virtual void Set_UndoBar(char) = 0;
+    virtual void Set_DoBar(char) = 0;
+    virtual void Show() = 0;
+    virtual void Set(double) = 0;
 };
 
-ProgressBar::~ProgressBar(){
-	int j = BarLenth+6,k=0;	// 清除光标位置到行尾的内容
-	for(k=0;k<j;k++){
-		cout<<'\b';
-	}
-	int m = BarLenth+6,n=0;	// 清除光标位置到行尾的内容
-	for(n=0;n<m;n++){
-		cout<<"  ";
-	}
-	cout<<endl;
+class ProgressBarBuilder : public Builder
+{
+private:
+    unsigned int BarLenth;
+
+    char UndoBar_Filling;
+
+    char DoBar_Filling;
+
+    bool ShowFlag = false;
+
+public:
+    ProgressBarBuilder();
+    ~ProgressBarBuilder();
+    void Set_BarLenth(unsigned int) override;
+    void Set_UndoBar(char) override;
+    void Set_DoBar(char) override;
+    void Show() override;
+    void Set(double) override;
+};
+
+class Director
+{
+private:
+    Builder *builder;
+
+public:
+    Director(Builder *b);
+    ~Director();
+    void Construct();
+};
+
+ProgressBarBuilder::ProgressBarBuilder()
+{
+    BarLenth = 25;
+    UndoBar_Filling = '-';
+    DoBar_Filling = '=';
 }
 
-void  ProgressBar::Install(){
-	//初始化数据
-	BarLenth = 25;
-	UndoBar_Filling = '-';
-	DoBar_Filling = '=';
+ProgressBarBuilder::~ProgressBarBuilder()
+{
+    int j = BarLenth + 6, k = 0;
+    for (k = 0; k < j; k++)
+        cout << '\b';
+    int m = BarLenth + 6, n = 0;
+    for (n = 0; n < m; n++)
+        cout << "  ";
 }
 
-void ProgressBar::Set_BarLenth(unsigned int lenth){
-	BarLenth = lenth;
+void ProgressBarBuilder::Set_BarLenth(unsigned int lenth)
+{
+    BarLenth = lenth;
 }
 
-void ProgressBar::Set_UndoBar(char mark){
-	UndoBar_Filling = mark;
+void ProgressBarBuilder::Set_UndoBar(char mark)
+{
+    UndoBar_Filling = mark;
 }
 
-void ProgressBar::Set_DoBar(char mark){
-	DoBar_Filling = mark;
+void ProgressBarBuilder::Set_DoBar(char mark)
+{
+    DoBar_Filling = mark;
 }
 
-void ProgressBar::Show(){
-	cout<<'|';
-	int i = 0;
-	for(i=0;i<BarLenth;i++)
-		cout<<UndoBar_Filling;
-	cout<<"| 0%";
+void ProgressBarBuilder::Show()
+{
+    cout << '|';
+    int i = 0;
+    for (i = 0; i < BarLenth; i++)
+        cout << UndoBar_Filling;
+    cout << "| 0%";
 }
 
-void ProgressBar::Set(double persent){
-    //清除上一行
-	int j = BarLenth+6,k=0;	// 清除光标位置到行尾的内容
-	for(k=0;k<j;k++)
-		cout<<'\b';
-	
-	//计算并重新打印
-	int Do,Undo,temp;
-	
-	temp = (persent/100) * BarLenth;
-	Do = temp-(temp%1);
-	
-	Undo = BarLenth - Do;
-	
-	//打印
-	int i=0;
-	cout<<'|';
-	for(temp=0;i<Do;i++)
-		cout<<DoBar_Filling;
-	for(temp=0;i<BarLenth;i++)
-		cout<<UndoBar_Filling;
-	cout<<'|'<<persent<<'%';
+void ProgressBarBuilder::Set(double persent)
+{
+    int j = BarLenth + 6, k = 0;
+    for (k = 0; k < j; k++)
+        cout << '\b';
+
+    int Do, Undo, temp;
+
+    temp = (persent / 100) * BarLenth;
+    Do = temp - (temp % 1);
+
+    Undo = BarLenth - Do;
+
+    int i = 0;
+    cout << '|';
+    for (temp = 0; i < Do; i++)
+        cout << DoBar_Filling;
+    for (temp = 0; i < BarLenth; i++)
+        cout << UndoBar_Filling;
+    cout << '|' << persent << '%';
 }
 
-void ProgressBar_Test(){
-	ProgressBar *bar = new ProgressBar;
-	bar -> Install();
-	bar -> Set_BarLenth(50);
-	bar -> Show();
-	Sleep(1000);
-	bar -> Set(10);
-	Sleep(1000);
-	bar -> Set(25);
-	Sleep(1000);
-	bar -> Set(50);
-	Sleep(1000);
-	bar -> Set(75);
-	Sleep(1000);
-	bar -> Set(100);
-	delete bar;
+Director::Director(Builder *b)
+{
+    builder = b;
+}
+
+Director::~Director()
+{
+    delete builder;
+}
+
+void Director::Construct()
+{
+    builder->Show();
+}
+
+void ProgressBar_Test()
+{
+    Builder *bar = new ProgressBarBuilder;
+    bar->Set_BarLenth(50);
+    Director *director = new Director(bar);
+    director->Construct();
+    Sleep(1000);
+    bar->Set(10);
+    Sleep(1000);
+    bar->Set(25);
+    Sleep(1000);
+    bar->Set(50);
+    Sleep(1000);
+    bar->Set(75);
+    Sleep(1000);
+    bar->Set(100);
+    delete director;
 }
 // Class ProgressBar END============================================================
 
@@ -296,10 +328,9 @@ string Level0::Explain(string sentence, int line) {
 	
     return "";
 }
-
 /* 主函数 */
 int main(int argc,char* argv[]){
-	
+	ProgressBar_Test();	
 	/* 返回异常 */
 	if (argc != 2){
 		ZZHLogo();
@@ -362,6 +393,6 @@ int main(int argc,char* argv[]){
 		oFile<<L0.Explain(tempL,f)<<endl;;
 	}
 	oFile<<"return 0;\n}"<<endl;
-	system("pause");
+	Pause();
 	return 0;
 }
